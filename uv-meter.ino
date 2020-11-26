@@ -1,31 +1,53 @@
-// Include the SparkFun VEML6075 library.
-// Click here to get the library: http://librarymanager/All#SparkFun_VEML6075
-#include <SparkFun_VEML6075_Arduino_Library.h>
+/*!
+ * @file veml6075_simple.ino
+ *
+ * A basic test of the sensor with default settings
+ * 
+ * Designed specifically to work with the VEML6075 sensor from Adafruit
+ * ----> https://www.adafruit.com/products/3964
+ *
+ * These sensors use I2C to communicate, 2 pins (SCL+SDA) are required
+ * to interface with the breakout.
+ *
+ * Adafruit invests time and resources providing this open source code,
+ * please support Adafruit and open-source hardware by purchasing
+ * products from Adafruit!
+ *
+ * Written by Limor Fried/Ladyada for Adafruit Industries.  
+ *
+ * MIT license, all text here must be included in any redistribution.
+ *
+ */
+ 
+#include <Wire.h>
+#include "Adafruit_VEML6075.h"
 
-#define NUM_SAMPLES (500.0) /* 500 ~ 1.5s */
+#define NUM_SAMPLES (150.0) /* 150 ~ 1.0s */
 
 const double UVA_RES = 0.93 / 0.5016286645; // responsivity in counts/(uW/cm^2) @ 50ms integration time from datasheet scaled by value from SparkFun_VEML6075_Arduino_Library.cpp to get equivalent for 100ms
 const double UVB_RES = 2.1 / 0.5016286645;
 
-VEML6075 uv; // Create a VEML6075 object
+Adafruit_VEML6075 uv = Adafruit_VEML6075();
 
-void setup()
-{
+void setup() {
   Serial.begin(115200);
-  Wire.begin();
+  while (!Serial) { delay(10); }
+  Serial.println("VEML6075 UVA & UVB Meter");
   while (!uv.begin()) {
     Serial.println("Unable to communicate with VEML6075. Retrying...");
     delay(1000);
   }
+  Serial.println("Found VEML6075 sensor");
 }
+
 
 int loopCtr = 0;
 void loop()
 {
   double uvb = 0, uva = 0;
   for (int i = 0; i < NUM_SAMPLES; i++) {
-    uva += uv.uva(); // side note: this is half as fast as it could be, because
-    uvb += uv.uvb(); // uva() and uvb() each take a sample.
+    uva += uv.readUVA(); // side note: this is half as fast as it could be, because
+    uvb += uv.readUVB(); // each read takes a new sample.
   }
   uva = uva / NUM_SAMPLES / UVA_RES; // take the average of many samples
   uvb = uvb / NUM_SAMPLES / UVB_RES;
