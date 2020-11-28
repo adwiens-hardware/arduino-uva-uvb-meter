@@ -21,13 +21,13 @@ void setup()
 void loop()
 {
   float uvb = 0, uva = 0, uvcomp1 = 0, uvcomp2 = 0;
-  for (int i = 0; i < NUM_SAMPLES; i++) {
-    uva += uv.rawUva(); // side note: this is half as fast as it could be, because
-    uvb += uv.rawUvb(); // each takes a sample.
+  for (int i = 0; i < NUM_SAMPLES; i++) { // take the average of many samples
+    uva += uv.rawUva();
+    uvb += uv.rawUvb();
     uvcomp1 += uv.uvComp1();
     uvcomp2 += uv.uvComp2();
   }
-  uva = uva / NUM_SAMPLES / UVA_RES; // take the average of many samples
+  uva = uva / NUM_SAMPLES / UVA_RES;
   uvb = uvb / NUM_SAMPLES / UVB_RES;
   uvcomp1 /= NUM_SAMPLES; // if the uvcomp's are small enough, they can be ignored
   uvcomp2 /= NUM_SAMPLES;
