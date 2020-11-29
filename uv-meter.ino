@@ -15,21 +15,21 @@ void setup()
   Wire.begin();
   while (!uv.begin()) delay(1000);
   uv.setIntegrationTime(VEML6075::IT_50MS); // 50ms
-  Serial.println("UVB(uW/cm2) UVA(uW/cm2) uvcomp1 uvcomp2");
+  Serial.println("UVB(uW/cm^2) UVA(uW/cm^2) uvcomp1 uvcomp2");
 }
 
 void loop()
 {
   float uvb = 0, uva = 0, uvcomp1 = 0, uvcomp2 = 0;
-  for (int i = 0; i < NUM_SAMPLES; i++) { // take the average of many samples
-    uva += uv.rawUva();
-    uvb += uv.rawUvb();
+  for (int i = 0; i < NUM_SAMPLES; i++) {
+    uva += uv.uva(); // uva() and uvb() are raw counts with uvComp1 & 2 noise subtracted
+    uvb += uv.uvb(); // use rawUva() & rawUvb() for raw counts without compensation
     uvcomp1 += uv.uvComp1();
     uvcomp2 += uv.uvComp2();
   }
-  uva = uva / NUM_SAMPLES / UVA_RES;
+  uva = uva / NUM_SAMPLES / UVA_RES; // take the average of many samples
   uvb = uvb / NUM_SAMPLES / UVB_RES;
-  uvcomp1 /= NUM_SAMPLES; // if the uvcomp's are small enough, they can be ignored
+  uvcomp1 /= NUM_SAMPLES;
   uvcomp2 /= NUM_SAMPLES;
   Serial.println(String(uvb) + "," + String(uva) + "," + String(uvcomp1) + "," + String(uvcomp2));
 }
